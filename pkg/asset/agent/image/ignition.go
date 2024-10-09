@@ -22,7 +22,6 @@ import (
 	"github.com/openshift/assisted-service/api/v1beta1"
 	"github.com/openshift/assisted-service/models"
 	"github.com/openshift/installer/pkg/asset"
-	agentcommon "github.com/openshift/installer/pkg/asset/agent"
 	"github.com/openshift/installer/pkg/asset/agent/agentconfig"
 	"github.com/openshift/installer/pkg/asset/agent/common"
 	"github.com/openshift/installer/pkg/asset/agent/gencrypto"
@@ -219,8 +218,9 @@ func (a *Ignition) Generate(_ context.Context, dependencies asset.Parents) error
 		archName = infraEnv.Spec.CpuArchitecture
 	}
 	// Examine the release payload to see if its multi
-	releaseArch, err := agentcommon.DetermineReleaseImageArch(agentManifests.GetPullSecretData(), agentManifests.ClusterImageSet.Spec.ReleaseImage)
-	if err != nil {
+	releaseArch, err := version.ReleaseArchitecture()
+
+	if err != nil || releaseArch == "unknown" {
 		logrus.Warnf("Unable to validate the release image architecture, using infraEnv.Spec.CpuArchitecture for the release image arch")
 		releaseArch = archName
 	} else {

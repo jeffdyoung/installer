@@ -93,7 +93,7 @@ func ReleaseArchitecture() (string, error) {
 		return "unknown", nil
 	}
 	if strings.HasPrefix(releaseArchitecturesPadded, releaseArchitecturesPrefix) {
-		logrus.Warn("Release Image Architecture not detected. Release Image Architecture is unknown")
+		logrus.Warnf("Release Image Architecture not detected, Release Image Architecture is unknown. Verify that this binary was extracted with correct version of oc")
 		return "unknown", nil
 	}
 	nullTerminator := strings.IndexByte(releaseArchitecturesPadded, '\x00')

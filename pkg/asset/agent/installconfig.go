@@ -21,6 +21,7 @@ import (
 	"github.com/openshift/installer/pkg/types/none"
 	"github.com/openshift/installer/pkg/types/validation"
 	"github.com/openshift/installer/pkg/types/vsphere"
+	"github.com/openshift/installer/pkg/version"
 )
 
 const (
@@ -161,12 +162,14 @@ func (a *OptionalInstallConfig) validateReleaseArch(ctx context.Context, install
 	if asseterr != nil {
 		allErrs = append(allErrs, field.InternalError(fieldPath, asseterr))
 	}
-	releaseArch, err := DetermineReleaseImageArch(installConfig.PullSecret, releaseImage.PullSpec)
+	releaseArch, err := version.ReleaseArchitecture()
 	if err != nil {
 		logrus.Warnf("Unable to validate the release image architecture, skipping validation")
 	} else {
 		// Validate that the release image supports the install-config architectures.
 		switch releaseArch {
+		case "unknown":
+			logrus.Warnf("architecture for release image %s is not known, skipping validation", releaseImage.PullSpec)
 		// Check the release image to see if it is multi.
 		case "multi":
 			logrus.Debugf("multi architecture release image %s found, all archs supported", releaseImage.PullSpec)
